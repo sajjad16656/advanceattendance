@@ -647,7 +647,25 @@ font-size:15px;
             </div>
 
         </div>
+<!-- ===========================
+     REMARKS
+=========================== -->
 
+<div class="input-group">
+
+<label>Remarks (Optional)</label>
+
+<div class="input-box">
+
+<input
+type="text"
+id="remarks"
+maxlength="150"
+placeholder="Enter any notes or remarks">
+
+</div>
+
+</div>
         <!-- Buttons -->
 
         <div class="button-row">
@@ -717,7 +735,7 @@ font-size:15px;
 <script>
 
 const script_url =
-"https://script.google.com/macros/s/AKfycbzsAo6G6VHcJ9XCG6UBLx3D66xDJdtLGXAScfnum41XRZTD-q-K09fKVBnJg9D_aBGD/exec";
+"https://script.google.com/macros/s/AKfycbwLqHHI9Lv3SoNJpTytVp1XmdCw-Ov30KkLI1rRz64O5sMHCuXHK22i4eKvqne-QoHS/exec";
 
 const loader =
 document.getElementById("loader");
@@ -739,6 +757,8 @@ document.getElementById("empname");
 
 const locationSelect =
 document.getElementById("locationSelect");
+const remarks =
+document.getElementById("remarks");
 /* ===========================================
    PART 4
    Utility Functions & Event Handlers
@@ -963,7 +983,7 @@ async function sendLocation(actionType) {
             Accuracy: "N/A",
 
             City: "ON LEAVE",
-
+ Remarks: remarks.value.trim(),
             Battery: await getBatteryStatus(),
 
             Device: getDeviceOS(),
@@ -1011,7 +1031,7 @@ async function sendLocation(actionType) {
                 Accuracy:Math.round(position.coords.accuracy),
 
                 City:locationSelect.value,
-
+Remarks: remarks.value.trim(),   // <-- Ye line add karo
                 Battery:await getBatteryStatus(),
 
                 Device:getDeviceOS(),
@@ -1135,7 +1155,7 @@ async function postAttendance(payload){
             empid.value="";
 
             empname.value="";
-
+            remarks.value="";
             locationSelect.selectedIndex=0;
 
         }else{
