@@ -1242,31 +1242,53 @@ function checkAccuracy(acc){
 }
 
 // -------------------------
-// Auto Save Last Name
+// Auto Save All Inputs (ID, Name & Duty Station)
 // -------------------------
 
-empname.addEventListener("change",()=>{
-
-    localStorage.setItem(
-        "LastEmployee",
-        empname.value
-    );
-
+// جیسے ہی ملازم نام تبدیل کرے گا، وہ سیو ہو جائے گا
+empname.addEventListener("change", () => {
+    localStorage.setItem("LastEmployeeName", empname.value.trim());
 });
 
-window.addEventListener("load",()=>{
+// جیسے ہی ملازم موبائل نمبر تبدیل کرے گا، وہ سیو ہو جائے گا
+empid.addEventListener("change", () => {
+    localStorage.setItem("LastEmployeeID", empid.value.trim());
+});
 
-    const lastName=
-        localStorage.getItem("LastEmployee");
+// جیسے ہی ملازم ڈیوٹی اسٹیشن تبدیل کرے گا، وہ سیو ہو جائے گا
+locationSelect.addEventListener("change", () => {
+    localStorage.setItem("LastDutyStation", locationSelect.value);
+});
 
-    if(lastName){
+window.addEventListener("load", () => {
+    const lastID = localStorage.getItem("LastEmployeeID");
+    const lastName = localStorage.getItem("LastEmployeeName");
+    const lastLoc = localStorage.getItem("LastDutyStation");
 
-        empname.value=lastName;
-
+    // محفوظ شدہ موبائل نمبر واپس لائیں
+    if (lastID) {
+        empid.value = lastID;
     }
 
-});
+    // محفوظ شدہ ملازم کا نام واپس لائیں
+    if (lastName) {
+        empname.value = lastName;
+    }
 
+    // محفوظ شدہ ڈیوٹی اسٹیشن واپس لائیں
+    if (lastLoc) {
+        locationSelect.value = lastLoc;
+    }
+
+    // اگر نمبر پہلے سے سیو ہے تو نام پر فوکس کرے، ورنہ نمبر پر فوکس کرے
+    if (!lastID) {
+        empid.focus();
+    } else if (!lastName) {
+        empname.focus();
+    }
+
+    showMessage("Ready for Attendance");
+});
 // -------------------------
 // Enter Key Navigation
 // -------------------------
