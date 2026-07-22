@@ -700,7 +700,14 @@ placeholder="Enter any notes or remarks">
         </div>
 
         <!-- Status -->
+  <!-- Loader -->
+        <div class="loader" id="loader"></div>
 
+        <!-- 🌟 آپ نے بالکل یہاں اس جگہ پر یہ بیٹری والا کوڈ پیسٹ کرنا ہے 🌟 -->
+        <div id="battery-status-bar" style="margin-top: 15px; padding: 12px; border-radius: 12px; background: #eef9f2; font-size: 13px; font-weight: 600; text-align: center; color: #0b7a3e; border: 1px solid #d6f0df; transition: 0.3s;">
+            <i class="fa-solid fa-battery-three-quarters" id="bat-icon" style="color: #0b7a3e; margin-right: 8px;"></i>
+            Phone Battery: <span id="bat-level">Checking...</span>
+        </div>
         <div id="msg">
 
             Ready for Attendance...
@@ -1260,6 +1267,8 @@ locationSelect.addEventListener("change", () => {
     localStorage.setItem("LastDutyStation", locationSelect.value);
 });
 
+
+
 window.addEventListener("load", () => {
     const lastID = localStorage.getItem("LastEmployeeID");
     const lastName = localStorage.getItem("LastEmployeeName");
@@ -1289,6 +1298,7 @@ window.addEventListener("load", () => {
 
     showMessage("Ready for Attendance");
 });
+
 // -------------------------
 // Enter Key Navigation
 // -------------------------
@@ -1385,7 +1395,7 @@ async function fetchWithTimeout(url,options={},timeout=20000){
 // -------------------------
 
 function flashSuccess(){
-
+playSuccessSound();
     document.querySelector(".container")
     .animate(
 
@@ -1414,7 +1424,7 @@ function flashSuccess(){
 // -------------------------
 
 function flashError(){
-
+playErrorSound();
     document.querySelector(".container")
     .animate(
 
@@ -1484,6 +1494,67 @@ console.log(
     "HQ NLC TPT Fleet Attendance Loaded Successfully."
 );
 
+// کامیابی پر پیاری سی سافٹ ڈیجیٹل بیپ بجانے کا فنکشن
+function playSuccessSound() {
+    try {
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = ctx.createOscillator();
+        let gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, ctx.currentTime); // High pitch notification beep
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15); // بجنے کا دورانیہ 0.15 سیکنڈ
+    } catch(e) { console.log("Audio not supported"); }
+}
+
+// حاضری ریجیکٹ یا ایرر آنے پر ڈبل وارننگ بیپ
+function playErrorSound() {
+    try {
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = ctx.createOscillator();
+        let gain = ctx.createGain();
+        osc.type = "sawtooth"; // وارننگ ٹائپ ٹون
+        osc.frequency.setValueAtTime(220, ctx.currentTime); // Low pitch error tone
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    } catch(e) { console.log("Audio not supported"); }
+}
+// لائیو بیٹری چیکر اور کلر چینجر لاجک
+if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+        function updateLevel() {
+            let pct = Math.round(battery.level * 100);
+            let batBox = document.getElementById("battery-status-bar");
+            let batLevel = document.getElementById("bat-level");
+            let batIcon = document.getElementById("bat-icon");
+            
+            batLevel.innerHTML = pct + "%" + (battery.charging ? " (Charging ⚡)" : "");
+            
+            if (pct <= 20 && !battery.charging) {
+                batBox.style.background = "#fce8e6"; // ہلکا لال رنگ
+                batBox.style.color = "#d93025";
+                batIcon.style.color = "#d93025";
+                batBox.style.border = "1px solid #fad2cf";
+                // ہلکا سا وائبریشن یا شیک اینیمیشن
+                batBox.animate([{transform:"scale(1)"},{transform:"scale(1.02)"},{transform:"scale(1)"}], {duration:500, iterations:Infinity});
+            } else {
+                batBox.style.background = "#eef9f2"; // ہلکا سبز رنگ
+                batBox.style.color = "#0b7a3e";
+                batIcon.style.color = "#0b7a3e";
+                batBox.style.border = "1px solid #d6f0df";
+            }
+        }
+        updateLevel();
+        battery.addEventListener("levelchange", updateLevel);
+        battery.addEventListener("chargingchange", updateLevel);
+    });
+}
 </script>
 
 </body>
